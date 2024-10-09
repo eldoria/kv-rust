@@ -3,5 +3,5 @@ mod linked_list;
 
 
 fn main() {
-    let hashmap = hashmap::HashMap::new(10);
+    let hashmap = hashmap::HashMap::new();
 }
