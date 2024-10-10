@@ -38,17 +38,17 @@ impl HashMap {
         hash_value % self.capacity
     }
 
-    fn get(&self, key: Value) -> Value {
-        let idx = self.hash(&key);
+    fn get(&self, key: &Value) -> Option<&Value> {
+        let idx = self.hash(key);
+        let mut linked_list = self.map.get(idx as usize)?;
 
-        let mut linked_list: LinkedList = self.map[idx as usize];
         loop {
-            if linked_list.key == Some(key) {
-                return linked_list.value
-            } else if linked_list.pointer {
-                linked_list = linked_list.pointer
+            if linked_list.key.as_ref() == Some(key) {
+                return linked_list.value.as_ref();
+            } else if let Some(ref next) = &linked_list.pointer {
+                linked_list = next;
             } else {
-                panic!("key is not present in hashmap")
+                return None;
             }
         }
     }
