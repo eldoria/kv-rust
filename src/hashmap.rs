@@ -52,4 +52,26 @@ impl HashMap {
             }
         }
     }
+
+    fn push(mut self, key: &Value, value: &Value) -> Option<Value> {
+        let idx = self.hash(key);
+        let mut linked_list = self.map.get_mut(idx as usize)?;
+
+        loop {
+            if linked_list.key.as_ref() == Some(key) {
+                linked_list.value = Some(value.clone());
+                return linked_list.value.clone();  // Optionally return the new value
+            } else if let Some(ref mut next) = linked_list.pointer {
+                linked_list = next;
+            } else {
+                let new_cell: LinkedList = LinkedList {
+                    key: Some(key.clone()),
+                    value: Some(value.clone()),
+                    pointer: None,
+                };
+                linked_list.pointer = Some(Box::new(new_cell));
+                return None;  // Indicate that the value was newly inserted
+            }
+        }
+    }
 }

@@ -1,4 +1,4 @@
-#[derive(PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum Value {
     Int(i64),
     Text(String)
