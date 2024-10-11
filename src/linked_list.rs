@@ -1,7 +1,18 @@
-#[derive(Clone, PartialEq)]
+use std::fmt;
+
+#[derive(Clone, PartialEq, Debug)]
 pub enum Value {
     Int(i64),
     Text(String)
+}
+
+impl fmt::Display for Value {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Int(i) => write!(f, "{}", i),
+            Self::Text(s) => write!(f, "{}", s)
+        }
+    }
 }
 
 pub struct LinkedList {

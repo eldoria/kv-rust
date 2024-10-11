@@ -38,7 +38,7 @@ impl HashMap {
         hash_value % self.capacity
     }
 
-    fn get(&self, key: &Value) -> Option<&Value> {
+    pub fn get(&self, key: &Value) -> Option<&Value> {
         let idx = self.hash(key);
         let mut linked_list = self.map.get(idx as usize)?;
 
@@ -53,7 +53,7 @@ impl HashMap {
         }
     }
 
-    fn push(mut self, key: &Value, value: &Value) -> Option<Value> {
+    pub fn push(&mut self, key: &Value, value: &Value) -> Option<Value> {
         let idx = self.hash(key);
         let mut linked_list = self.map.get_mut(idx as usize)?;
 

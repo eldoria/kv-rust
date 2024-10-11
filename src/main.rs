@@ -1,7 +1,41 @@
 mod hashmap;
 mod linked_list;
 
+use linked_list::Value;
+
 
 fn main() {
-    let hashmap = hashmap::HashMap::new();
+    let mut hashmap = hashmap::HashMap::new();
+
+    let mut keys: Vec<Value> = vec![
+        Value::Int(1),
+        Value::Int(2),
+        Value::Text("key_1".to_string()),
+        Value::Text("key_2".to_string()),
+    ];
+
+    // Example of creating values as well
+    let values: Vec<Value> = vec![
+        Value::Int(1),
+        Value::Text("1".to_string()),
+        Value::Int(2),
+        Value::Text("2".to_string()),
+    ];
+
+    for (key, value) in keys.iter().zip(values.iter()) {
+        hashmap.push(key.into(), value.into());
+    }
+
+    keys.push(Value::Text("key_invalid".to_string())); // to check None case
+
+    for key in keys.iter() {
+        match hashmap.get(key) {
+            Some(value) => {
+                println!("Value of the key {} is {}", key, value);
+            },
+            None => {
+                println!("Key {} not found in the hashmap", key);
+            }
+        }
+    }
 }
