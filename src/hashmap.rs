@@ -59,8 +59,9 @@ impl HashMap {
 
         loop {
             if linked_list.key.as_ref() == Some(key) {
+                let old_value = linked_list.value.clone();
                 linked_list.value = Some(value.clone());
-                return linked_list.value.clone();  // Optionally return the new value
+                return old_value;
             } else if let Some(ref mut next) = linked_list.pointer {
                 linked_list = next;
             } else {
@@ -70,7 +71,7 @@ impl HashMap {
                     pointer: None,
                 };
                 linked_list.pointer = Some(Box::new(new_cell));
-                return None;  // Indicate that the value was newly inserted
+                return None;
             }
         }
     }
