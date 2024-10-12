@@ -1,27 +1,26 @@
 use crate::linked_list::LinkedList;
 use crate::linked_list::Value;
-use array_init::array_init;
-
-
-const HASHMAP_INITIAL_CAPACITY: usize = 10;
 
 pub struct HashMap {
     capacity: u32,
     size: u32,
-    map: [LinkedList; HASHMAP_INITIAL_CAPACITY]
+    hashmap: Vec<LinkedList>
 }
 
 
 impl HashMap {
-    pub fn new() -> HashMap {
-        let linked_list_array : [LinkedList; HASHMAP_INITIAL_CAPACITY] = array_init(|_| LinkedList::new());
+    pub fn new(capacity: &u32) -> HashMap {
+        let hashmap: Vec<LinkedList> = (0..*capacity)
+            .map(|_| LinkedList::new())
+            .collect();
 
-        HashMap{
-            capacity: HASHMAP_INITIAL_CAPACITY as u32,
+        HashMap {
+            capacity: *capacity as u32,
             size: 0,
-            map: linked_list_array
+            hashmap,
         }
     }
+
 
     fn hash(&self, key: &Value) -> u32 {
         let key_str = match key {
@@ -38,9 +37,39 @@ impl HashMap {
         hash_value % self.capacity
     }
 
+    fn extend(&mut self) {
+        if self.size >= self.capacity / 2 {
+            let old_hashmap = self.hashmap.clone();
+
+            self.capacity *= 2;
+            let new_hashmap: Vec<LinkedList> = (0..self.capacity)
+                .map(|_| LinkedList::new())
+                .collect();
+            self.hashmap = new_hashmap;
+
+            for i in 0..self.capacity {
+                let mut old_linked_list = old_hashmap.get(i as usize).unwrap();
+                loop {
+                    match old_linked_list.pointer {
+                        Some(ref next) => {
+                            self.push(old_linked_list.key.as_ref().unwrap(), &old_linked_list.value.as_ref().unwrap());
+                            old_linked_list = next;
+                        }
+                        None => {
+                            if old_linked_list.value.is_some() {
+                                self.push(&old_linked_list.key.as_ref().unwrap(), &old_linked_list.value.as_ref().unwrap());
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     pub fn get(&self, key: &Value) -> Option<&Value> {
         let idx = self.hash(key);
-        let mut linked_list = self.map.get(idx as usize)?;
+        let mut linked_list = self.hashmap.get(idx as usize)?;
 
         loop {
             if linked_list.key.as_ref() == Some(key) {
@@ -54,13 +83,15 @@ impl HashMap {
     }
 
     pub fn push(&mut self, key: &Value, value: &Value) -> Option<Value> {
+        self.extend();
         let idx = self.hash(key);
-        let mut linked_list = self.map.get_mut(idx as usize)?;
+        let mut linked_list = self.hashmap.get_mut(idx as usize)?;
 
         loop {
             if linked_list.key.as_ref() == Some(key) {
                 let old_value = linked_list.value.clone();
                 linked_list.value = Some(value.clone());
+                self.size += 1;
                 return old_value;
             } else if let Some(ref mut next) = linked_list.pointer {
                 linked_list = next;
@@ -71,6 +102,7 @@ impl HashMap {
                     pointer: None,
                 };
                 linked_list.pointer = Some(Box::new(new_cell));
+                self.size += 1;
                 return None;
             }
         }
@@ -78,18 +110,20 @@ impl HashMap {
 
     pub fn delete(&mut self, key: &Value) -> Option<Value> {
         let idx = self.hash(key);
-        let mut linked_list = self.map.get_mut(idx as usize)?;
+        let mut linked_list = self.hashmap.get_mut(idx as usize)?;
 
         loop {
             if linked_list.key.as_ref() == Some(key) {
                 let old_value = linked_list.value.clone();
                 linked_list.value = None;
+                self.size -= 1;
                 return old_value;
             } else if (linked_list.pointer.as_ref().unwrap().key.as_ref() == Some(key)) &
                     (linked_list.pointer.as_ref().unwrap().pointer.is_some()) {
                 let old_value = linked_list.value.clone();
                 linked_list.value = None;
                 linked_list.pointer = linked_list.pointer.as_ref().unwrap().pointer.clone();
+                self.size -= 1;
                 return old_value;
             } else if let Some(ref mut next) = linked_list.pointer {
                 linked_list = next;

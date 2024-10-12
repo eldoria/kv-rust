@@ -5,7 +5,7 @@ use linked_list::Value;
 
 
 fn main() {
-    let mut hashmap = hashmap::HashMap::new();
+    let mut hashmap = hashmap::HashMap::new(&10);
 
     let keys: Vec<Value> = vec![
         Value::Int(1),
