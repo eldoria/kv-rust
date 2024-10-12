@@ -75,4 +75,28 @@ impl HashMap {
             }
         }
     }
+
+    pub fn delete(&mut self, key: &Value) -> Option<Value> {
+        let idx = self.hash(key);
+        let mut linked_list = self.map.get_mut(idx as usize)?;
+
+        loop {
+            if linked_list.key.as_ref() == Some(key) {
+                let old_value = linked_list.value.clone();
+                linked_list.value = None;
+                return old_value;
+            } else if (linked_list.pointer.as_ref().unwrap().key.as_ref() == Some(key)) &
+                    (linked_list.pointer.as_ref().unwrap().pointer.is_some()) {
+                let old_value = linked_list.value.clone();
+                linked_list.value = None;
+                linked_list.pointer = linked_list.pointer.as_ref().unwrap().pointer.clone();
+                return old_value;
+            } else if let Some(ref mut next) = linked_list.pointer {
+                linked_list = next;
+            }
+            else {
+                return None
+            }
+        }
+    }
 }

@@ -15,6 +15,7 @@ impl fmt::Display for Value {
     }
 }
 
+#[derive(Clone)]
 pub struct LinkedList {
     pub key: Option<Value>,
     pub value: Option<Value>,

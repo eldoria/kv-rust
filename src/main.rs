@@ -7,7 +7,7 @@ use linked_list::Value;
 fn main() {
     let mut hashmap = hashmap::HashMap::new();
 
-    let mut keys: Vec<Value> = vec![
+    let keys: Vec<Value> = vec![
         Value::Int(1),
         Value::Int(2),
         Value::Text("key_1".to_string()),
@@ -26,7 +26,7 @@ fn main() {
         hashmap.push(key.into(), value.into());
     }
 
-    keys.push(Value::Text("key_invalid".to_string())); // to check None case
+    hashmap.delete(&Value::Text("key_2".to_string())); // to check None case
 
     for key in keys.iter() {
         match hashmap.get(key) {
