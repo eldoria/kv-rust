@@ -41,5 +41,12 @@ fn main() {
         }
     }
 
-    print!("{}", hashmap)
+    print!("{}", hashmap);
+
+    hashmap.push(
+        &Value::Text("key_trigger_extend".to_string()),
+        &Value::Text("6".to_string())
+    );
+
+    print!("{}", hashmap);
 }

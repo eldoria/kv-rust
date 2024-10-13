@@ -42,14 +42,15 @@ impl HashMap {
     fn extend(&mut self) {
         if self.size >= self.capacity / 2 {
             let old_hashmap = self.hashmap.clone();
+            let old_capacity = self.capacity;
 
             self.capacity *= 2;
-            let new_hashmap: Vec<LinkedList> = (0..self.capacity)
+            let new_hashmap: Vec<LinkedList> = (0..self.capacity*2)
                 .map(|_| LinkedList::new())
                 .collect();
             self.hashmap = new_hashmap;
 
-            for i in 0..self.capacity {
+            for i in 0..old_capacity {
                 let mut old_linked_list = old_hashmap.get(i as usize).unwrap();
                 loop {
                     match old_linked_list.pointer {
@@ -66,7 +67,7 @@ impl HashMap {
                     }
                 }
             }
-            println!("Hashmap extended from {} to {}", self.capacity/2, self.capacity)
+            println!("Hashmap extended from {} to {}", old_capacity, self.capacity)
         }
     }
 
