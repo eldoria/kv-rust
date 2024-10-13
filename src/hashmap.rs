@@ -1,5 +1,7 @@
-use crate::linked_list::LinkedList;
-use crate::linked_list::Value;
+use std::fmt::{self, Display};
+use std::cmp::min;
+
+use crate::linked_list::{LinkedList, Value, DisplayableOption};
 
 pub struct HashMap {
     capacity: u32,
@@ -64,6 +66,7 @@ impl HashMap {
                     }
                 }
             }
+            println!("Hashmap extended from {} to {}", self.capacity/2, self.capacity)
         }
     }
 
@@ -88,20 +91,29 @@ impl HashMap {
         let mut linked_list = self.hashmap.get_mut(idx as usize)?;
 
         loop {
-            if linked_list.key.as_ref() == Some(key) {
+            if linked_list.key.as_ref() == Some(key) { // if we find a key already present, we replace the value
                 let old_value = linked_list.value.clone();
                 linked_list.value = Some(value.clone());
                 self.size += 1;
                 return old_value;
-            } else if let Some(ref mut next) = linked_list.pointer {
+            } else if let Some(ref mut next) = linked_list.pointer { // if we are not at the end of the linked list, we continue
                 linked_list = next;
-            } else {
-                let new_cell: LinkedList = LinkedList {
-                    key: Some(key.clone()),
-                    value: Some(value.clone()),
-                    pointer: None,
-                };
-                linked_list.pointer = Some(Box::new(new_cell));
+            } else { // we are at the end of the list
+                match linked_list.value {
+                    None => {
+                        let old_value = linked_list.value.clone();
+                        linked_list.key = Some(key.clone());
+                        linked_list.value = Some(value.clone());
+                    },
+                    Some(_) => {
+                        let new_cell: LinkedList = LinkedList {
+                            key: Some(key.clone()),
+                            value: Some(value.clone()),
+                            pointer: None,
+                        };
+                        linked_list.pointer = Some(Box::new(new_cell));
+                    }
+                }
                 self.size += 1;
                 return None;
             }
@@ -132,5 +144,57 @@ impl HashMap {
                 return None
             }
         }
+    }
+}
+
+impl Display for HashMap {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for i in 0..self.capacity {
+            let mut keys: Vec<Value> = Vec::new();
+            let mut vals: Vec<Value> = Vec::new();
+
+            let mut current_linked_list = self.hashmap.get(i as usize).unwrap();
+            loop {
+                // Unwrap and access keys and values
+                if let Some(ref node) = current_linked_list.pointer {
+                    keys.push(node.key.clone().unwrap());
+                    vals.push(node.value.clone().unwrap());
+                    current_linked_list = node;  // Move to the next node
+                } else {
+                    // Handle last node if it contains data
+                    if current_linked_list.value.is_some() {
+                        keys.push(current_linked_list.key.clone().unwrap());
+                        vals.push(current_linked_list.value.clone().unwrap());
+                    }
+
+                    // Formatting output
+                    let mut line_1 = format!("{}   ", i);
+                    let mut line_2 = format!("    ");
+                    for j in 0..keys.len() {
+                        let key = keys.get(j).unwrap();
+                        let val = vals.get(j).unwrap();
+
+                        let size_key = key.len();
+                        let size_val = val.len();
+                        let space_increment_key =
+                            " ".repeat(size_val.saturating_sub(size_key) as usize);
+                        let space_increment_val =
+                            " ".repeat(size_key.saturating_sub(size_val) as usize);
+
+                        if j == keys.len() - 1 {
+                            line_1.push_str(&format!("key: {}{}", key, space_increment_key));
+                            line_2.push_str(&format!("val: {}{}", val, space_increment_val));
+                        } else {
+                            line_1.push_str(&format!("key: {}{} -> ", key, space_increment_key));
+                            line_2.push_str(&format!("val: {}{} -> ", val, space_increment_val));
+                        }
+                    }
+
+                    write!(f, "{}\n{}\n", line_1, line_2)?;
+                    break;
+                }
+            }
+        }
+        Ok(())
     }
 }
