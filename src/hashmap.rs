@@ -45,10 +45,11 @@ impl HashMap {
             let old_capacity = self.capacity;
 
             self.capacity *= 2;
-            let new_hashmap: Vec<LinkedList> = (0..self.capacity*2)
+            let new_hashmap: Vec<LinkedList> = (0..self.capacity)
                 .map(|_| LinkedList::new())
                 .collect();
             self.hashmap = new_hashmap;
+            self.size = 0;
 
             for i in 0..old_capacity {
                 let mut old_linked_list = old_hashmap.get(i as usize).unwrap();
@@ -158,8 +159,8 @@ impl Display for HashMap {
             loop {
                 // Unwrap and access keys and values
                 if let Some(ref node) = current_linked_list.pointer {
-                    keys.push(node.key.clone().unwrap());
-                    vals.push(node.value.clone().unwrap());
+                    keys.push(current_linked_list.key.clone().unwrap());
+                    vals.push(current_linked_list.value.clone().unwrap());
                     current_linked_list = node;  // Move to the next node
                 } else {
                     // Handle last node if it contains data
@@ -168,13 +169,20 @@ impl Display for HashMap {
                         vals.push(current_linked_list.value.clone().unwrap());
                     }
 
+                    // to align the first key/value between each line
+                    let size_id = Value::Int(i as i64).len();
+                    let max_size_id = Value::Int((self.capacity - 1) as i64).len();
+                    let space_increment_id= " ".repeat(size_id as usize);
+                    let max_space_increment_id = " ".repeat((max_size_id - size_id) as usize);
+
                     // Formatting output
-                    let mut line_1 = format!("{}   ", i);
-                    let mut line_2 = format!("    ");
+                    let mut line_1 = format!("{}{}   ", i, max_space_increment_id);
+                    let mut line_2 = format!("{}{}   ", space_increment_id, max_space_increment_id);
                     for j in 0..keys.len() {
                         let key = keys.get(j).unwrap();
                         let val = vals.get(j).unwrap();
 
+                        // to align keys/values line by line
                         let size_key = key.len();
                         let size_val = val.len();
                         let space_increment_key =
