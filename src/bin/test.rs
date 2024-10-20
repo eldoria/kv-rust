@@ -7,5 +7,5 @@ fn main() {
         hashmap,
         "database/data.json")
     );
-    print!("return: {:?}", Storage::load("database/data.json"))
+    print!("return: {:?}", Storage::load("database/data.json", 5))
 }
