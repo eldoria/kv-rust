@@ -1,5 +1,6 @@
 mod hashmap;
 mod linked_list;
+mod storage;
 
 use linked_list::Value;
 

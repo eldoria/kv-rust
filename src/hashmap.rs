@@ -1,8 +1,9 @@
 use std::fmt::{self, Display};
-use std::cmp::min;
+use serde::{Serialize, Deserialize};
 
-use crate::linked_list::{LinkedList, Value, DisplayableOption};
+use crate::linked_list::{LinkedList, Value};
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct HashMap {
     capacity: u32,
     size: u32,

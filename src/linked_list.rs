@@ -1,6 +1,7 @@
 use std::fmt;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub enum Value {
     Int(i64),
     Text(String)
@@ -35,7 +36,7 @@ impl Value {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct LinkedList {
     pub key: Option<Value>,
     pub value: Option<Value>,
